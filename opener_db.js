@@ -132,9 +132,9 @@ async function searchOpenerByFumen() {
     }
 
     if (!container.firstChild) {
-        console.log("Nothing found by that name in this database.")
+        console.log("Nothing found with that fumen in this database.")
         let temp = document.createElement('h1');
-        temp.textContent = 'Nothing found by that name in this database.';
+        temp.textContent = 'Nothing found with that fumen in this database.';
         container.appendChild(temp);
 
     }

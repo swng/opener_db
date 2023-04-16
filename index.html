@@ -1,0 +1,46 @@
+<html>
+	<script src="./utils/tetris-fumen.js"></script>
+    <script defer src="./opener_db.js"></script>
+    
+    <head>
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Opener DB" />
+        <meta
+			property="og:description"
+			content='insert engaging description... um, this is a site that exists for searching modern tetris openers'
+		/>
+		<meta
+			property="og:image"
+			content="https://lh5.googleusercontent.com/S6wO-k8yVJG97yphMq-4Xcl470FINeGQ-dE923yzukhxC6sbuF96aIQltlysMr58EjXtzbNcdDB9cynOhH-rySG2XNwEgnpK49eUbrrJZhFsVrKBxkFnbiconWqoLvkonz_6vBEdNHzGnDrvOU0LcA"
+		/>
+		<title>Opener DB</title>
+    </head>
+
+
+	<body>
+		<h1>Opener DB</h1>
+		<br>
+		I like apples
+		<br>
+		Data Source: <a href="https://docs.google.com/document/d/1rwI5Uww5AygrF3QSBm0o6hqTG1X8P2cRsJaBjYFMzDg/pub">Ivan(28283)’s Comprehensive Opener Database</a>. Last datascrape: <span id="timestamp"></span>
+		<br>
+
+		<button type="button" onclick="loadRandomOpener()">Load Random Opener</button>
+		<br>
+
+		<input type="text" id="name search" />
+		<button type="button" onclick="searchOpenerByName()">Name Search</button>
+		<br>
+
+		<input type="text" id="fumen search" />
+		<button type="button" onclick="searchOpenerByFumen()">Fumen Search</button>
+		<br>
+
+		How to use the SEARCH function?
+		<br>
+		It’s pretty simple: Put whatever opener you’re looking for by using all the pieces in a bag, graying it out, and using CTRL+F to search for it. <a href="https://swng.github.io/fumen/?v115@9gB8DeG8CeH8BeG8CeD8JeAgH">Example fumen</a> for PCO.
+
+		<div id="container"></div>
+
+	</body>
+</html>

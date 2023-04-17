@@ -37,13 +37,16 @@ async function loadOpener(opener) {
         if (key in opener) {
             if (key == 'Image') {
                 fumens = opener[key][0];
-                console.log(fumens);
+                // console.log(fumens);
                 fumenrender(fumens, container)
             }
             else {
-                temp = document.createElement("span");
-                temp.innerHTML = opener[key];
-                container.appendChild(temp);
+                for (line of opener[key]) {
+                    temp = document.createElement("span");
+                    temp.innerHTML = line;
+                    container.appendChild(temp);
+                }
+                
             }
         }
     }

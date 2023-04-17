@@ -17,11 +17,33 @@ loadData().then( () => {
     console.log(data[0].timestamp);
 
     const urlSearchParams = new URLSearchParams(window.location.search);
+
+    index = urlSearchParams.get("i");
+    if (index) {
+        index = Number(index);
+        if (Number.isInteger(index) && index > 0 && index < data.length) {
+            let opener = data[index];
+            loadOpener(opener);
+        }
+    }
+
     query = urlSearchParams.get("q");
+    if (query) {
+        document.getElementById('name search').value = query;
+        searchOpenerByName();
+    }
 
-    document.getElementById('name search').value = query;
+    fumenQuery = urlSearchParams.get("f");
+    if (fumenQuery) {
+        document.getElementById('fumen search').value = fumenQuery;
+        searchOpenerByFumen();
+    }
 
-    searchOpenerByName();
+    fumenQuery2 = urlSearchParams.get("f2");
+    if (fumenQuery2) {
+        document.getElementById('fumen search 2').value = fumenQuery2;
+        searchOpenerByFumen2();
+    }
 
 }
 );
@@ -57,6 +79,11 @@ async function loadOpener(opener) {
                 
             }
         }
+    }
+
+    // for debugging purposes, let's also look for the index
+    for(let i = 1; i < data.length; i++) {
+        if (data[i].name == opener.name) console.log(i);
     }
 }
 

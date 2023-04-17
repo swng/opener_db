@@ -68,7 +68,8 @@ async function loadOpener(opener) {
             if (key == 'Image') {
                 fumens = opener[key][0];
                 // console.log(fumens);
-                fumenrender(fumens, container)
+                if (document.getElementById("mirror").checked) fumenrender(mirrorFumen(fumens), container);
+                else fumenrender(fumens, container);
             }
             else {
                 for (line of opener[key]) {

@@ -3,7 +3,7 @@ const { decoder, encoder } = require('tetris-fumen');
 var data;
 
 async function loadData() {
-    await fetch("./data.json")
+    await fetch("./data-2.json")
         .then((response) => response.json())
         .then((muh_data) => {
             data = muh_data;
@@ -35,25 +35,18 @@ async function loadOpener(opener) {
 
     for (let key of keys) {
         if (key in opener) {
-            temp = document.createElement('span');
-            temp.innerHTML = opener[key];
-            container.appendChild(temp);
+            if (key == 'Image') {
+                fumens = opener[key][0];
+                console.log(fumens);
+                fumenrender(fumens, container)
+            }
+            else {
+                temp = document.createElement("span");
+                temp.innerHTML = opener[key];
+                container.appendChild(temp);
+            }
         }
     }
-
-    // trying to make images load
-    // var images = container.getElementsByTagName("img");
-    // var loadedImages = 0;
-
-    // for (var i = 0; i < images.length; i++) {
-    //     images[i].addEventListener("load", function () {
-    //         loadedImages++;
-    //         if (loadedImages == images.length) {
-    //             // All images have loaded
-    //             // Do something
-    //         }
-    //     });
-    // }
 }
 
 async function loadRandomOpener() {

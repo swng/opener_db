@@ -159,7 +159,8 @@ async function searchOpenerByFumen2() {
 
     for(let opener of data) {
         if ("Image" in opener) { // search the fumens inside "image" section
-            for (fumen of greyout(opener["Image"][0])) { // grey them out too
+            let greyedOutFumens = greyout(opener["Image"][0]); // grey them out too
+            for (fumen of greyedOutFumens.concat(mirrorFumen(greyedOutFumens))) {  // check mirrors too
                 if (fumen.includes(query)) {
                     // just doing .includes()
                     // maybe add fuzzier search later? Maybe remove all Ts to further increase chances of a match?

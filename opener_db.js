@@ -15,6 +15,14 @@ async function loadData() {
 loadData().then( () => {
     document.getElementById("timestamp").innerHTML = data[0].timestamp;
     console.log(data[0].timestamp);
+
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    query = urlSearchParams.get("q");
+
+    document.getElementById('name search').value = query;
+
+    searchOpenerByName();
+
 }
 );
 

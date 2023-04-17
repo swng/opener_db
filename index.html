@@ -49,7 +49,16 @@
 		How to use the SEARCH function?
 		<br>
 		Put whatever opener you’re looking for by using all the pieces in a bag, greyed out. <a href="https://swng.github.io/fumen/?v115@9gB8DeG8CeH8BeG8CeD8JeAgH">Example fumen</a> for PCO.
-
+		<br>
+		<!-- <label for="category primary">primary</label>
+		<input type="text" id="category primary"/>
+		<label for="category secondary">secondary</label>
+		<input type="text" id="category secondary" /> -->
+		<label for="category primary">primary</label>
+		<select id="category primary" name="category primary" onchange = "updateSecondaryDropdown()"></select>
+		<label for="category secondary">secondary</label>
+		<select id="category secondary" name="category secondary"></select>
+		<button type="button" onclick="searchOpenerByCategory()">Category Search</button>
 		<br>
 		<input type="checkbox" id="mirror" name="mirror" value = false />
 		<label for="mirror"> Mirror rendered images</label>

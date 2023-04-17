@@ -28,6 +28,7 @@ figure {
     background-color: var(--bg-grey);
     font-size: 16px;
     color: whitesmoke;
+    margin-left: 30px;
   }
   table {
     margin: 0 auto;

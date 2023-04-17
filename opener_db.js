@@ -1,9 +1,10 @@
 const { decoder, encoder } = require('tetris-fumen');
 
 var data;
+var categories;
 
 async function loadData() {
-    await fetch("./data-2.json")
+    await fetch("./data-3.json")
         .then((response) => response.json())
         .then((muh_data) => {
             data = muh_data;
@@ -21,7 +22,7 @@ loadData().then( () => {
     index = urlSearchParams.get("i");
     if (index) {
         index = Number(index);
-        if (Number.isInteger(index) && index > 0 && index < data.length) {
+        if (Number.isInteger(index) && index >= 0 && index < data.length) {
             let opener = data[index];
             loadOpener(opener);
         }
@@ -45,6 +46,33 @@ loadData().then( () => {
         searchOpenerByFumen2();
     }
 
+    // grab all categories and then populate dropdown with all these options
+    categories = {};
+    // let primary_categories = new Set();
+    // let secondary_categories = {}
+    for (let [_, [category_primary, category_secondary]] of Object.entries(data[0].categories)) {
+        // primary_categories.add(category_primary);
+        // secondary_categories.add(category_secondary);
+        if (category_primary in categories) {
+            categories[category_primary].push(category_secondary);
+        } else {
+            categories[category_primary] = [];
+        }
+    }
+
+    // console.log(primary_categories);
+
+    let dropdown_category_primary = document.getElementById("category primary");
+    let dropdown_category_secondary = document.getElementById("category secondary");
+
+    for (let [primary, secondary] of Object.entries(categories)) {
+        if (primary != "Sources") dropdown_category_primary.append(new Option(primary));
+    }
+    dropdown_category_secondary.append(new Option(""));
+    for (let category of categories[dropdown_category_primary.value]) {
+        dropdown_category_secondary.append(new Option(category));
+    }
+    
 }
 );
 
@@ -54,6 +82,7 @@ async function loadOpener(opener) {
     let container = document.getElementById('container');
 
     container.appendChild(document.createElement('hr'));
+    container.appendChild(document.createElement('br'));
 
     console.log(opener);
 
@@ -81,6 +110,9 @@ async function loadOpener(opener) {
             }
         }
     }
+
+    container.appendChild(document.createElement('br'));
+    container.appendChild(document.createElement('br'));
 
     // for debugging purposes, let's also look for the index
     for(let i = 1; i < data.length; i++) {
@@ -223,3 +255,49 @@ async function searchOpenerByFumen2() {
 document.getElementById('fumen search 2').addEventListener('keyup', (event) => {
     if (event.key === 'Enter') searchOpenerByFumen2();
 })
+
+
+async function searchOpenerByCategory() {
+    let container = document.getElementById('container');
+    while (container.firstChild) {
+		container.removeChild(container.firstChild);
+	}
+
+    let category_primary = document.getElementById('category primary').value.toLowerCase();
+    let category_secondary = document.getElementById('category secondary').value.toLowerCase();
+
+    for(let opener of data) {
+        let tag_primary = opener.tag_primary.toLowerCase();
+        let tag_secondary = opener.tag_secondary.toLowerCase();
+
+        if (tag_primary.includes(category_primary) && tag_secondary.includes(category_secondary)) { // just doing .includes() on a .toLowerCase()
+            // maybe add fuzzier search later?
+            await loadOpener(opener);
+        }
+    }
+
+    if (!container.firstChild) {
+        console.log("Nothing found with those categories in this database.")
+        let temp = document.createElement('h1');
+        temp.textContent = 'Nothing found with those categories in this database.';
+        container.appendChild(temp);
+
+    }
+    
+
+}
+
+async function updateSecondaryDropdown() {
+    let category_primary = document.getElementById('category primary').value;
+    let secondary_options = categories[category_primary];
+    // console.log(secondary_options);
+
+    let dropdown_category_secondary = document.getElementById("category secondary");
+    while (dropdown_category_secondary.options.length > 0) {                
+        dropdown_category_secondary.remove(0);
+    }
+    dropdown_category_secondary.append(new Option(""));
+    for (let category of categories[category_primary]) {
+        dropdown_category_secondary.append(new Option(category));
+    }
+}

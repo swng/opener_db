@@ -3,6 +3,16 @@ const { decoder, encoder } = require('tetris-fumen');
 var data;
 var categories;
 
+const classMap = {
+    "L": "l_mino",
+    "J": "j_mino",
+    "S": "s_mino",
+    "Z": "z_mino",
+    "I": "i_mino",
+    "O": "o_mino",
+    "T": "t_mino",
+  };
+
 async function loadData() {
     await fetch("./data-3.json")
         .then((response) => response.json())
@@ -104,9 +114,19 @@ async function loadOpener(opener) {
             }
             else {
                 for (line of opener[key]) {
-                    temp = document.createElement("span");
-                    temp.innerHTML = line;
-                    container.appendChild(temp);
+                    // find tetramino letters encoded in the form [0 width character] [Letter]
+                    let tetramino_regex = /(?<=\u200b)[LJIOSZT]/g;
+                    line = line.replace(tetramino_regex, (match) => {
+                        const className = classMap[match];
+                        return `<span class='${className}'>${match}</span>`;
+                      });
+                    line = line.replace(/\u200b/g, "");
+
+                    // add the HTML to the page
+                    // temp = document.createElement("span");
+                    // temp.innerHTML = line;
+                    // container.appendChild(temp);
+                    container.innerHTML += line;
                 }
                 
             }
@@ -316,21 +336,50 @@ async function updateSecondaryDropdown() {
 
 function dynamic_image_mirror() {
     let image_containers = document.getElementsByName("images");
-        for (let image_container of image_containers) { // within each imaage container
-            let figures = image_container.getElementsByTagName("figure");
-            let fumens = []
-            for (let figure of figures) {
-                fumens.push(figure.getAttribute("fumen")); // grab all fumen codes
-            }
-            while (image_container.firstChild) { // remove all the images
-                image_container.removeChild(image_container.firstChild);
-            }
-            fumenrender(mirrorFumen(fumens), image_container); // add in the mirrored images
-            
+    for (let image_container of image_containers) {
+        // within each image container
+        let figures = image_container.getElementsByTagName("figure");
+        let fumens = [];
+        for (let figure of figures) {
+            fumens.push(figure.getAttribute("fumen")); // grab all fumen codes
         }
+        while (image_container.firstChild) {
+            // remove all the images
+            image_container.removeChild(image_container.firstChild);
+        }
+        fumenrender(mirrorFumen(fumens), image_container); // add in the mirrored images
+    }
+
+    // mirror mino text
+    const l_collection = [...document.getElementsByClassName("l_mino")];
+    const j_collection = [...document.getElementsByClassName("j_mino")];
+    const s_collection = [...document.getElementsByClassName("s_mino")];
+    const z_collection = [...document.getElementsByClassName("z_mino")];
+    for (let i = 0; i < l_collection.length; i++) {
+        l_collection[i].innerHTML = 'J';
+        l_collection[i].className = "j_mino";
+    }
+    for (let i = 0; i < j_collection.length; i++) {
+        j_collection[i].innerHTML = 'L';
+        j_collection[i].className = "l_mino";
+    }
+    for (let i = 0; i < s_collection.length; i++) {
+        s_collection[i].innerHTML = 'Z';
+        s_collection[i].className = "z_mino";
+    }
+    for (let i = 0; i < z_collection.length; i++) {
+        z_collection[i].innerHTML = 'S';
+        z_collection[i].className = "S_mino";
+    }
 }
 
 document.addEventListener('keyup', (event) => {
+    const target = event.target;
+    if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA")) {
+        // The hotkey should not apply when typing in an input or textarea element
+        return;
+    }
+
     if (event.key == 'm') {
         document.getElementById('mirror').checked ^= true;
         dynamic_image_mirror();

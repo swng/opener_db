@@ -40,6 +40,10 @@ loadData().then( () => {
     const urlSearchParams = new URLSearchParams(window.location.search);
 
     index = urlSearchParams.get("i");
+    query = urlSearchParams.get("q");
+    query2 = urlSearchParams.get("q2");
+    fumenQuery = urlSearchParams.get("f");
+    fumenQuery2 = urlSearchParams.get("f2");
     if (index) {
         index = Number(index);
         if (Number.isInteger(index) && index >= 0 && index < data.length) {
@@ -47,21 +51,19 @@ loadData().then( () => {
             loadOpener(opener);
         }
     }
-
-    query = urlSearchParams.get("q");
-    if (query) {
+    else if (query) {
         document.getElementById('name search').value = query;
         searchOpenerByName();
     }
-
-    fumenQuery = urlSearchParams.get("f");
-    if (fumenQuery) {
+    else if (query2) {
+        document.getElementById('name search levenshtein').value = query2;
+        searchOpenerByNameLevenshtein();
+    }
+    else if (fumenQuery) {
         document.getElementById('fumen search').value = fumenQuery;
         searchOpenerByFumen();
     }
-
-    fumenQuery2 = urlSearchParams.get("f2");
-    if (fumenQuery2) {
+    else if (fumenQuery2) {
         document.getElementById('fumen search 2').value = fumenQuery2;
         searchOpenerByFumen2();
     }
@@ -172,6 +174,56 @@ async function loadRandomOpener() {
     let randomOpener = data[Math.floor(Math.random()*data.length)];
     await loadOpener(randomOpener)
 }
+
+async function searchOpenerByNameLevenshtein() {
+    let container = document.getElementById('container');
+    while (container.firstChild) {
+		container.removeChild(container.firstChild);
+	}
+
+    let query = document.getElementById('name search levenshtein').value.toLowerCase();
+
+    let results = [];
+
+    for(let i = 0; i < data.length; i++) {
+        let opener = data[i];
+        let name = opener.name.toLowerCase().split(' ');
+
+        let min = 99999999999;
+        for (let word of name) {
+            temp = levenshteinDistance(query, word);
+            if (temp < min) min = temp;
+        }
+
+        let result = {
+            index: i,
+            distance: min
+        }
+
+        results.push(result);
+    }
+    
+    results.sort((a,b) => a.distance - b.distance);
+    let lowestDistance = results[0].distance;
+    console.log("lowest distance", lowestDistance);
+    let lowestResults = results.filter((result) => result.distance === lowestDistance);
+
+    for (let i = 0; i < Math.min(10,lowestResults.length); i++) {
+        await loadOpener(data[results[i].index]);
+    }
+
+    // if (!container.firstChild) {
+    //     console.log("Nothing found by that name in this database.")
+    //     let temp = document.createElement('h1');
+    //     temp.textContent = 'Nothing found by that name in this database.';
+    //     container.appendChild(temp);
+    // }
+
+}
+
+document.getElementById('name search levenshtein').addEventListener('keyup', (event) => {
+    if (event.key === 'Enter') searchOpenerByNameLevenshtein();
+})
 
 async function searchOpenerByName() {
     let container = document.getElementById('container');
@@ -403,3 +455,39 @@ document.getElementById('mirror').addEventListener('change', (e) => {
     dynamic_image_mirror();
     mirror_mino_text();
 });
+
+function levenshteinDistance(s, t) { // generated this function with chatGPT
+    // Create a matrix with dimensions of s and t
+    const matrix = Array(s.length + 1)
+      .fill()
+      .map(() => Array(t.length + 1).fill(0));
+  
+    // Fill the first row and column of the matrix
+    for (let i = 0; i <= s.length; i++) {
+      matrix[i][0] = i;
+    }
+    for (let j = 0; j <= t.length; j++) {
+      matrix[0][j] = j;
+    }
+  
+    // Fill in the rest of the matrix
+    for (let i = 1; i <= s.length; i++) {
+      for (let j = 1; j <= t.length; j++) {
+        if (s[i - 1] === t[j - 1]) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] =
+            1 +
+            Math.min(
+              matrix[i - 1][j],
+              matrix[i][j - 1],
+              matrix[i - 1][j - 1]
+            );
+        }
+      }
+    }
+  
+    // Return the Levenshtein distance (bottom right corner of matrix)
+    return matrix[s.length][t.length];
+  }
+  

@@ -96,9 +96,11 @@ async function loadOpener(opener) {
         if (key in opener) {
             if (key == 'Image') {
                 fumens = opener[key][0];
-                // console.log(fumens);
-                if (document.getElementById("mirror").checked) fumenrender(mirrorFumen(fumens), container);
-                else fumenrender(fumens, container);
+                temp = document.createElement('container');
+                temp.setAttribute("name", "images")
+                container.appendChild(temp);
+                if (document.getElementById("mirror").checked) fumenrender(mirrorFumen(fumens), temp);
+                else fumenrender(fumens, temp);
             }
             else {
                 for (line of opener[key]) {
@@ -108,6 +110,16 @@ async function loadOpener(opener) {
                 }
                 
             }
+        }
+    }
+
+    // special case for Contents
+    if (opener.name == "Contents") {
+        let ivan_doc = "https://docs.google.com/document/d/1rwI5Uww5AygrF3QSBm0o6hqTG1X8P2cRsJaBjYFMzDg/pub";
+        let links = document.querySelectorAll('a');
+        for (let link of links) {
+            last_part = link.href.split("/").splice(-1)[0]; // all hashtag links should go to ivan doc instead
+            if (last_part[0] == '#') link.href = ivan_doc + last_part;
         }
     }
 
@@ -301,3 +313,30 @@ async function updateSecondaryDropdown() {
         dropdown_category_secondary.append(new Option(category));
     }
 }
+
+function dynamic_image_mirror() {
+    let image_containers = document.getElementsByName("images");
+        for (let image_container of image_containers) { // within each imaage container
+            let figures = image_container.getElementsByTagName("figure");
+            let fumens = []
+            for (let figure of figures) {
+                fumens.push(figure.getAttribute("fumen")); // grab all fumen codes
+            }
+            while (image_container.firstChild) { // remove all the images
+                image_container.removeChild(image_container.firstChild);
+            }
+            fumenrender(mirrorFumen(fumens), image_container); // add in the mirrored images
+            
+        }
+}
+
+document.addEventListener('keyup', (event) => {
+    if (event.key == 'm') {
+        document.getElementById('mirror').checked ^= true;
+        dynamic_image_mirror();
+    }
+});
+
+document.getElementById('mirror').addEventListener('change', (e) => {
+    dynamic_image_mirror();
+});

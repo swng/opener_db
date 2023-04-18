@@ -197,6 +197,7 @@ function fumenrender(fumenCodes, container, comments = undefined) {
 
                 a.appendChild(img);
             }
+            a.setAttribute("fumen", code);
             container.appendChild(a);
         } catch (error) { console.log(code, error); }
     });

@@ -13,6 +13,16 @@ const classMap = {
     "T": "t_mino",
   };
 
+  reverseMappingLetters = {
+    "L": "J",
+    "J": "L",
+    "S": "Z",
+    "Z": "S",
+    "T": "T",
+    "O": "O",
+    "I": "I",
+}
+
 async function loadData() {
     await fetch("./data-3.json")
         .then((response) => response.json())
@@ -117,9 +127,10 @@ async function loadOpener(opener) {
                     // find tetramino letters encoded in the form [0 width character] [Letter]
                     let tetramino_regex = /(?<=\u200b)[LJIOSZT]/g;
                     line = line.replace(tetramino_regex, (match) => {
+                        if (document.getElementById("mirror").checked) match = reverseMappingLetters[match];
                         const className = classMap[match];
                         return `<span class='${className}'>${match}</span>`;
-                      });
+                    });
                     line = line.replace(/\u200b/g, "");
 
                     // add the HTML to the page
@@ -334,23 +345,7 @@ async function updateSecondaryDropdown() {
     }
 }
 
-function dynamic_image_mirror() {
-    let image_containers = document.getElementsByName("images");
-    for (let image_container of image_containers) {
-        // within each image container
-        let figures = image_container.getElementsByTagName("figure");
-        let fumens = [];
-        for (let figure of figures) {
-            fumens.push(figure.getAttribute("fumen")); // grab all fumen codes
-        }
-        while (image_container.firstChild) {
-            // remove all the images
-            image_container.removeChild(image_container.firstChild);
-        }
-        fumenrender(mirrorFumen(fumens), image_container); // add in the mirrored images
-    }
-
-    // mirror mino text
+function mirror_mino_text() {
     const l_collection = [...document.getElementsByClassName("l_mino")];
     const j_collection = [...document.getElementsByClassName("j_mino")];
     const s_collection = [...document.getElementsByClassName("s_mino")];
@@ -373,6 +368,23 @@ function dynamic_image_mirror() {
     }
 }
 
+function dynamic_image_mirror() {
+    let image_containers = document.getElementsByName("images");
+    for (let image_container of image_containers) {
+        // within each image container
+        let figures = image_container.getElementsByTagName("figure");
+        let fumens = [];
+        for (let figure of figures) {
+            fumens.push(figure.getAttribute("fumen")); // grab all fumen codes
+        }
+        while (image_container.firstChild) {
+            // remove all the images
+            image_container.removeChild(image_container.firstChild);
+        }
+        fumenrender(mirrorFumen(fumens), image_container); // add in the mirrored images
+    }
+}
+
 document.addEventListener('keyup', (event) => {
     const target = event.target;
     if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA")) {
@@ -383,9 +395,11 @@ document.addEventListener('keyup', (event) => {
     if (event.key == 'm') {
         document.getElementById('mirror').checked ^= true;
         dynamic_image_mirror();
+        mirror_mino_text();
     }
 });
 
 document.getElementById('mirror').addEventListener('change', (e) => {
     dynamic_image_mirror();
+    mirror_mino_text();
 });

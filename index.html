@@ -38,8 +38,8 @@
 		<button type="button" onclick="searchOpenerByName()">Name Search</button>
 		<br>
 
-		<input type="text" id="name search levenshtein" />
-		<button type="button" onclick="searchOpenerByNameLevenshtein()">Name Search Levenshtein (might catch typos)</button>
+		<input type="text" id="name search damerau levenshtein" />
+		<button type="button" onclick="searchOpenerByNameDamerauLevenshtein()">Name Search Damerau Levenshtein (might catch typos)</button>
 		<br>
 
 		<input type="text" id="fumen search" />
@@ -53,6 +53,11 @@
 		How to use the SEARCH function?
 		<br>
 		Put whatever opener you’re looking for by using all the pieces in a bag, greyed out. <a href="https://swng.github.io/fumen/?v115@9gB8DeG8CeH8BeG8CeD8JeAgH">Example fumen</a> for PCO.
+		<br>
+		<br>
+		<input type="text" id="queue">
+		<button type="button" onclick="searchOpenerByQueue()">Queue Search</button>
+		Because there are so many, these will be filtered by the categories below.
 		<br>
 		<!-- <label for="category primary">primary</label>
 		<input type="text" id="category primary"/>

@@ -2,6 +2,7 @@ const { decoder, encoder } = require('tetris-fumen');
 
 var data;
 var categories;
+var cover_data;
 
 const classMap = {
     "L": "l_mino",
@@ -28,6 +29,13 @@ async function loadData() {
         .then((response) => response.json())
         .then((muh_data) => {
             data = muh_data;
+        })
+        .catch((error) => console.error("Error loading JSON file", error));
+
+        await fetch("./data-3-covered.json")
+        .then((response) => response.json())
+        .then((muh_data) => {
+            cover_data = muh_data;
         })
         .catch((error) => console.error("Error loading JSON file", error));
 
@@ -175,13 +183,13 @@ async function loadRandomOpener() {
     await loadOpener(randomOpener)
 }
 
-async function searchOpenerByNameLevenshtein() {
+async function searchOpenerByNameDamerauLevenshtein() {
     let container = document.getElementById('container');
     while (container.firstChild) {
 		container.removeChild(container.firstChild);
 	}
 
-    let query = document.getElementById('name search levenshtein').value.toLowerCase();
+    let query = document.getElementById('name search damerau levenshtein').value.toLowerCase();
 
     let results = [];
 
@@ -191,7 +199,7 @@ async function searchOpenerByNameLevenshtein() {
 
         let min = 99999999999;
         for (let word of name) {
-            temp = levenshteinDistance(query, word);
+            temp = DamerauLevenshteinDistance(query, word);
             if (temp < min) min = temp;
         }
 
@@ -221,8 +229,8 @@ async function searchOpenerByNameLevenshtein() {
 
 }
 
-document.getElementById('name search levenshtein').addEventListener('keyup', (event) => {
-    if (event.key === 'Enter') searchOpenerByNameLevenshtein();
+document.getElementById('name search damerau levenshtein').addEventListener('keyup', (event) => {
+    if (event.key === 'Enter') searchOpenerByNameDamerauLevenshtein();
 })
 
 async function searchOpenerByName() {
@@ -379,8 +387,37 @@ async function searchOpenerByCategory() {
 
     }
     
+}
+
+async function searchOpenerByQueue() {
+    let container = document.getElementById('container');
+    while (container.firstChild) {
+		container.removeChild(container.firstChild);
+	}
+
+    let queue = document.getElementById('queue').value.toUpperCase();
+    let applicable_openers = cover_data[queue];
+
+    let category_primary = document.getElementById('category primary').value.toLowerCase();
+    let category_secondary = document.getElementById('category secondary').value.toLowerCase();
+
+    for (let opener_index of applicable_openers) {
+        let opener = data[opener_index];
+        let tag_primary = opener.tag_primary.toLowerCase();
+        let tag_secondary = opener.tag_secondary.toLowerCase();
+
+        if (tag_primary.includes(category_primary) && tag_secondary.includes(category_secondary)) { // just doing .includes() on a .toLowerCase()
+            // maybe add fuzzier search later?
+            await loadOpener(opener);
+        }
+
+    }
 
 }
+
+document.getElementById('queue').addEventListener('keyup', (event) => {
+    if (event.key === 'Enter') searchOpenerByQueue();
+});
 
 async function updateSecondaryDropdown() {
     let category_primary = document.getElementById('category primary').value;
@@ -456,38 +493,69 @@ document.getElementById('mirror').addEventListener('change', (e) => {
     mirror_mino_text();
 });
 
-function levenshteinDistance(s, t) { // generated this function with chatGPT
-    // Create a matrix with dimensions of s and t
-    const matrix = Array(s.length + 1)
-      .fill()
-      .map(() => Array(t.length + 1).fill(0));
+// function levenshteinDistance(s, t) { // generated this function with chatGPT
+//     // Create a matrix with dimensions of s and t
+//     const matrix = Array(s.length + 1)
+//       .fill()
+//       .map(() => Array(t.length + 1).fill(0));
   
-    // Fill the first row and column of the matrix
-    for (let i = 0; i <= s.length; i++) {
-      matrix[i][0] = i;
-    }
-    for (let j = 0; j <= t.length; j++) {
-      matrix[0][j] = j;
+//     // Fill the first row and column of the matrix
+//     for (let i = 0; i <= s.length; i++) {
+//       matrix[i][0] = i;
+//     }
+//     for (let j = 0; j <= t.length; j++) {
+//       matrix[0][j] = j;
+//     }
+  
+//     // Fill in the rest of the matrix
+//     for (let i = 1; i <= s.length; i++) {
+//       for (let j = 1; j <= t.length; j++) {
+//         if (s[i - 1] === t[j - 1]) {
+//           matrix[i][j] = matrix[i - 1][j - 1];
+//         } else {
+//           matrix[i][j] =
+//             1 +
+//             Math.min(
+//               matrix[i - 1][j],
+//               matrix[i][j - 1],
+//               matrix[i - 1][j - 1]
+//             );
+//         }
+//       }
+//     }
+  
+//     // Return the Levenshtein distance (bottom right corner of matrix)
+//     return matrix[s.length][t.length];
+//   }
+  
+
+  function DamerauLevenshteinDistance(str1, str2) {
+    const m = str1.length;
+    const n = str2.length;
+    const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(null));
+  
+    for (let i = 0; i <= m; i++) {
+      dp[i][0] = i;
     }
   
-    // Fill in the rest of the matrix
-    for (let i = 1; i <= s.length; i++) {
-      for (let j = 1; j <= t.length; j++) {
-        if (s[i - 1] === t[j - 1]) {
-          matrix[i][j] = matrix[i - 1][j - 1];
-        } else {
-          matrix[i][j] =
-            1 +
-            Math.min(
-              matrix[i - 1][j],
-              matrix[i][j - 1],
-              matrix[i - 1][j - 1]
-            );
+    for (let j = 0; j <= n; j++) {
+      dp[0][j] = j;
+    }
+  
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+        dp[i][j] = Math.min(
+          dp[i - 1][j] + 1, // deletion
+          dp[i][j - 1] + 1, // insertion
+          dp[i - 1][j - 1] + cost // substitution
+        );
+  
+        if (i > 1 && j > 1 && str1[i - 1] === str2[j - 2] && str1[i - 2] === str2[j - 1]) {
+          dp[i][j] = Math.min(dp[i][j], dp[i - 2][j - 2] + cost); // transposition
         }
       }
     }
   
-    // Return the Levenshtein distance (bottom right corner of matrix)
-    return matrix[s.length][t.length];
+    return dp[m][n];
   }
-  

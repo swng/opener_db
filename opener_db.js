@@ -28,14 +28,14 @@ const ivan_doc = "https://docs.google.com/document/d/1rwI5Uww5AygrF3QSBm0o6hqTG1
 const fumen_regex = /\?[a-zA-Z]\d+@.+/;
 
 async function loadData() {
-    await fetch("./data-3.json")
+    await fetch("./data-5.json")
         .then((response) => response.json())
         .then((muh_data) => {
             data = muh_data;
         })
         .catch((error) => console.error("Error loading JSON file", error));
 
-        await fetch("./data-3-covered.json")
+        await fetch("./data-5-covered.json")
         .then((response) => response.json())
         .then((muh_data) => {
             cover_data = muh_data;

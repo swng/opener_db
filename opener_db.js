@@ -14,7 +14,7 @@ const classMap = {
     "T": "t_mino",
   };
 
-  reverseMappingLetters = {
+const reverseMappingLetters = {
     "L": "J",
     "J": "L",
     "S": "Z",
@@ -23,6 +23,9 @@ const classMap = {
     "O": "O",
     "I": "I",
 }
+
+const ivan_doc = "https://docs.google.com/document/d/1rwI5Uww5AygrF3QSBm0o6hqTG1X8P2cRsJaBjYFMzDg/pub";
+const fumen_regex = /\?[a-zA-Z]\d+@.+/;
 
 async function loadData() {
     await fetch("./data-3.json")
@@ -154,14 +157,11 @@ async function loadOpener(opener) {
         }
     }
 
-    // special case for Contents
-    if (opener.name == "Contents") {
-        let ivan_doc = "https://docs.google.com/document/d/1rwI5Uww5AygrF3QSBm0o6hqTG1X8P2cRsJaBjYFMzDg/pub";
-        let links = document.querySelectorAll('a');
-        for (let link of links) {
-            last_part = link.href.split("/").splice(-1)[0]; // all hashtag links should go to ivan doc instead
-            if (last_part[0] == '#') link.href = ivan_doc + last_part;
-        }
+    let links = document.querySelectorAll('a');
+    for (let link of links) {
+        if (link.hash) link.href = ivan_doc + link.hash; // all hash links should go to ivan doc instead
+
+        if (fumen_regex.test(link)) link.href = 'https://swng.github.io/fumen/' + link.search; // :3
     }
 
     container.appendChild(document.createElement('br'));

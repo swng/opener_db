@@ -397,11 +397,14 @@ async function searchOpenerByQueue() {
 
     let queue = document.getElementById('queue').value.toUpperCase();
     let applicable_openers = cover_data[queue];
+    let mirrored_queue = queue.split("").map(a => reverseMappingLetters[a]).join("");
+    let applicable_openers_mirror = cover_data[mirrored_queue];
+    let applicable_openers_all = applicable_openers.concat(applicable_openers_mirror.filter((item) => applicable_openers.indexOf(item) < 0));
 
     let category_primary = document.getElementById('category primary').value.toLowerCase();
     let category_secondary = document.getElementById('category secondary').value.toLowerCase();
 
-    for (let opener_index of applicable_openers) {
+    for (let opener_index of applicable_openers_all) {
         let opener = data[opener_index];
         let tag_primary = opener.tag_primary.toLowerCase();
         let tag_secondary = opener.tag_secondary.toLowerCase();

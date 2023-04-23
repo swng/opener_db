@@ -132,8 +132,8 @@ async function loadOpener(opener) {
                 temp = document.createElement('container');
                 temp.setAttribute("name", "images")
                 container.appendChild(temp);
-                if (document.getElementById("mirror").checked) await fumenrender(mirrorFumen(fumens), temp);
-                else await fumenrender(fumens, temp);
+                if (document.getElementById("mirror").checked) fumenrender(mirrorFumen(fumens), temp);
+                else fumenrender(fumens, temp);
             }
             else {
                 for (line of opener[key]) {
@@ -473,7 +473,7 @@ async function dynamic_image_mirror() {
             // remove all the images
             image_container.removeChild(image_container.firstChild);
         }
-        await fumenrender(mirrorFumen(fumens), image_container); // add in the mirrored images
+        fumenrender(mirrorFumen(fumens), image_container); // add in the mirrored images
     }
 }
 

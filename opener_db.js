@@ -28,14 +28,14 @@ const ivan_doc = "https://docs.google.com/document/d/1rwI5Uww5AygrF3QSBm0o6hqTG1
 const fumen_regex = /\?[a-zA-Z]\d+@.+/;
 
 async function loadData() {
-    await fetch("./data-5.json")
+    await fetch("./data-7.json")
         .then((response) => response.json())
         .then((muh_data) => {
             data = muh_data;
         })
         .catch((error) => console.error("Error loading JSON file", error));
 
-        await fetch("./data-5-covered.json")
+        await fetch("./data-7-covered.json")
         .then((response) => response.json())
         .then((muh_data) => {
             cover_data = muh_data;
@@ -132,8 +132,8 @@ async function loadOpener(opener) {
                 temp = document.createElement('container');
                 temp.setAttribute("name", "images")
                 container.appendChild(temp);
-                if (document.getElementById("mirror").checked) fumenrender(mirrorFumen(fumens), temp);
-                else fumenrender(fumens, temp);
+                if (document.getElementById("mirror").checked) await fumenrender(mirrorFumen(fumens), temp);
+                else await fumenrender(fumens, temp);
             }
             else {
                 for (line of opener[key]) {
@@ -460,7 +460,7 @@ function mirror_mino_text() {
     }
 }
 
-function dynamic_image_mirror() {
+async function dynamic_image_mirror() {
     let image_containers = document.getElementsByName("images");
     for (let image_container of image_containers) {
         // within each image container
@@ -473,11 +473,11 @@ function dynamic_image_mirror() {
             // remove all the images
             image_container.removeChild(image_container.firstChild);
         }
-        fumenrender(mirrorFumen(fumens), image_container); // add in the mirrored images
+        await fumenrender(mirrorFumen(fumens), image_container); // add in the mirrored images
     }
 }
 
-document.addEventListener('keyup', (event) => {
+document.addEventListener('keyup', async (event) => {
     const target = event.target;
     if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA")) {
         // The hotkey should not apply when typing in an input or textarea element
@@ -486,13 +486,13 @@ document.addEventListener('keyup', (event) => {
 
     if (event.key == 'm') {
         document.getElementById('mirror').checked ^= true;
-        dynamic_image_mirror();
+        await dynamic_image_mirror();
         mirror_mino_text();
     }
 });
 
-document.getElementById('mirror').addEventListener('change', (e) => {
-    dynamic_image_mirror();
+document.getElementById('mirror').addEventListener('change',  async (e) => {
+    await dynamic_image_mirror();
     mirror_mino_text();
 });
 

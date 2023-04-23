@@ -12,7 +12,7 @@ const fumen_colors = {
     Empty: { normal: '#f3f3ed' }
 };
 
-function fumen_draw(fumenPage, tilesize, numrows, transparent) {
+async function fumen_draw(fumenPage, tilesize, numrows, transparent) {
 	const field = fumenPage.field;
 	const operation = fumenPage.operation;
 
@@ -147,16 +147,16 @@ delay = 500;
 start = 0;
 end = undefined;
 
-function fumenrender(fumenCodes, container, comments = undefined) {
+async function fumenrender(fumenCodes, container, comments = undefined) {
 	// while (container.firstChild) {
 	// 	container.removeChild(container.firstChild);
 	// }
-    fumenCodes.forEach((code, index) => {
+    fumenCodes.forEach(async (code, index) => {
         try {
             var pages = decoder.decode(code);
             a = document.createElement("figure");
             if (pages.length == 1) {
-                canvas = fumen_draw(pages[0], cellSize, height, transparency_fumen);
+                canvas = await fumen_draw(pages[0], cellSize, height, transparency_fumen);
 
                 documentCanvas = document.createElement('canvas');
                 documentCanvas.style.padding = '18px';
